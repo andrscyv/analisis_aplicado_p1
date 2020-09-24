@@ -26,18 +26,36 @@ iter = 0;        % contador para las iteraciones externas
 jregion = 0;       % contador interno
 
 n = length(x0);
-g = gradiente(fname,x);
+g = gradiente(f,x0);
 ng = norm(g);
-H = hessian(fname,x0);
+B = hessian(f,x0);
 delta = deltamax;
 xk = x0;
 
 while(ng>tol && iter<maxiter && jregion<maxregion)
     pk = doblez(B, g, delta);
     redact = feval(f,xk)-feval(f,xk+pk);
-    redpre = -((1/2)*pk'*H*pk+g'*pk);
+    redpre = -((1/2)*pk'*B*pk+g'*pk);
+    rho = redact/redpre;
+    
+    if rho >= (1 - eta)
+        delta = 2*delta;
+        xk = xk + pk;
+        jregion = 0;
+    elseif eta <= rho && rho <= (1-eta)
+        xk = xk + pk;
+        jregion = 0;
+    else
+        delta = 1/2 * delta;
+        jregion = jregion + 1;
+    end
+    
+    B = hessian(f, xk);
+    g = gradiente(f, xk);
+    ng = norm(g);
+    iter = iter + 1;
 end
 
-
+xf = xk;
 end
 
