@@ -10,10 +10,14 @@ function [xf, iter] = miregion(f, x0)
 %
 % Andres Cruz y Vera C.U.155899
 % Javier Montiel González C.U.159216
-%-------------------------------------------------------------------------
-% parámetros
-deltamin = 1.e-04;
-deltamax = 5; 
+%--------------------------------------------------------------------------
+% Parámetros
+
+%Tomamos delta en [deltamin, deltamax] 
+%donde:
+%deltamin = 1.e-04;
+%deltamax = 5; 
+delta= 5;
 eta = 0.25;
 maxiter = 100;    % número máximo de iteraciones externas permitidas
 maxregion = 20;    %es el numero máximo que permanece region de confianza 
@@ -22,12 +26,11 @@ tol = 1.e-06; % tolerancia para la norma del gradiente.
 
 % valores iniciales
 iter = 0;        % contador para las iteraciones externas
-jregion = 0;       % contador interno
+jregion = 0;     % contador interno
 
 g = gradiente(f,x0);
 ng = norm(g);
 B = hessian(f,x0);
-delta = deltamax;
 xk = x0;
 
 while(ng>tol && iter<maxiter && jregion<maxregion)
@@ -40,7 +43,7 @@ while(ng>tol && iter<maxiter && jregion<maxregion)
         delta = 2*delta;
         xk = xk + pk;
         jregion = 0;
-    elseif eta <= rho && rho <= (1-eta)
+    elseif eta <= rho && rho < (1-eta)
         xk = xk + pk;
         jregion = 0;
     else
