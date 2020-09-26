@@ -3,6 +3,14 @@ function [ps] = doblez(B, g, Delta)
 % Min (1/2)*p'*B*p + g'*p +f(x)
 % s.a. || p || <= Delta
 
+%Entradas
+%B es una matriz simétrica positiva definida de nxn
+%g es un vector distinto de cero de nx1
+%Delta es una constante mayor que cero
+
+%Salida
+%ps es la solución al problema cuadrático de región de confianza
+
 pN = -B\g; %dirección de Newton
 pC = -((g'*g)/(g'*B*g))*g; %punto de Cauchy
 

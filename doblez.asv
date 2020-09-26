@@ -3,6 +3,9 @@ function [ps] = doblez(B, g, Delta)
 % Min (1/2)*p'*B*p + g'*p +f(x)
 % s.a. || p || <= Delta
 
+%Entradas
+%B es 
+
 pN = -B\g; %dirección de Newton
 pC = -((g'*g)/(g'*B*g))*g; %punto de Cauchy
 
@@ -23,6 +26,7 @@ else
         u = pN - pC;
         a = u'*u; b= 2*pC'*u; c= pC'*pC-Delta^2;
         t = roots([a b c]);
+        %Tomamos la raíz positiva
         if t(1)>0
             ts = t(1);
         else
