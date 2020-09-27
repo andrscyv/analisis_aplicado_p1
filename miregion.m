@@ -10,7 +10,10 @@ function [xf, iter, deltas, puntos] = miregion(f, x0)
 % Salidas
 % xf vector columna de dimension n con la aproximación final.
 % iter número de iteraciones que se realizaron.
+% deltas es el vector que guarda los valores de delta en cada iteración
+% puntos es la matriz que guarda el valor de xk en cada iteración
 %
+% NOMBRES Y CLAVES ÚNICAS DEL EQUIPO:
 % Andres Cruz y Vera C.U.155899
 % Javier Montiel González C.U.159216
 %--------------------------------------------------------------------------
@@ -20,15 +23,15 @@ deltamin = 1.e-04;
 deltamax = 5; 
 delta= 1;
 eta = 0.25;        % Constate que determina si se acepta el paso
-maxiter = 100;     % número máximo de iteraciones externas permitidas
-maxregion = 20;    %es el numero máximo que permanece region de confianza 
+maxiter = 100;     % Número máximo de iteraciones externas permitidas
+maxregion = 20;    % Es el numero máximo que permanece region de confianza 
 %en un solo punto
-tol = 1.e-06; % tolerancia para la norma del gradiente.
+tol = 1.e-06;      % tolerancia para la norma del gradiente.
 
-% valores iniciales
+% Valores iniciales
 iter = 0;        % contador para las iteraciones externas
-jregion = 0;     % contador interno un punto xk
-iDelta = 0;      % contador interno para un valor delta
+jregion = 0;     % contador interno en un punto xk que no cambia
+iDelta = 0;      % contador interno para un valor delta que no cambia
 
 g = gradiente(f,x0);
 ng = norm(g);
@@ -46,7 +49,7 @@ while(ng>tol && iter<maxiter && jregion<maxregion && iDelta<20)
     puntos=[puntos; xk'];
     %El paso que se obtiene por el método del doblez
     pk = doblez(B, g, delta);
-    %Calculamos la recdución actual 
+    %Calculamos la reducción actual 
     redact = feval(f,xk)-feval(f,xk+pk);
     %Calculamos la reducción que se predice
     redpre = -((1/2)*pk'*B*pk+g'*pk);
@@ -80,6 +83,7 @@ while(ng>tol && iter<maxiter && jregion<maxregion && iDelta<20)
             delta = nuevoDelta;
             iDelta=0;
         else
+        %Se para el método porque el valor de delta y xk ya no cambian 
             iDelta= 20;
         end
         jregion = jregion + 1;

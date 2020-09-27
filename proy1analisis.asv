@@ -24,7 +24,7 @@ disp(Resultados);
 %Valores en el óptimo
 disp('Resultados en el óptimo:')
 normGrad=norm(gradiente(f,xf));
-x1_Opt= xf(1);
-x2_Opt= xf(2);
-optimo=table(iter, x1_Opt, x2_Opt, normGrad);
+x1_opt= xf(1);
+x2_opt= xf(2);
+optimo=table(iter, , x1_opt, x2_opt, normGrad);
 disp(optimo);

@@ -11,6 +11,10 @@ function [ps] = doblez(B, g, Delta)
 %Salida
 %ps es la solución al problema cuadrático de región de confianza
 
+% NOMBRES Y CLAVES ÚNICAS DEL EQUIPO:
+% Andres Cruz y Vera C.U.155899
+% Javier Montiel González C.U.159216
+
 pN = -B\g; %dirección de Newton
 pC = -((g'*g)/(g'*B*g))*g; %punto de Cauchy
 

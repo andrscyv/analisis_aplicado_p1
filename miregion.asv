@@ -1,0 +1,102 @@
+function [xf, iter, deltas, puntos] = miregion(f, x0)
+% Método de región de confianza para aproximar un mínimo
+% de f: Rn->R dos veces continuamente diferenciable
+
+% Entradas
+% f cadena de caracteres con con el nombre del código en Matlab de 
+% la función a minimizar.
+% x0 vector columna de dimensión n con el punto inicial.
+
+% Salidas
+% xf vector columna de dimension n con la aproximación final.
+% iter número de iteraciones que se realizaron.
+% deltas es el vector que guarda los valores de delta en cada iteración
+% puntos es la matriz que guarda el valor de xk en cada iteración
+%
+% NOMBRES Y CLAVES ÚNICAS DEL EQUIPO:
+% Andres Cruz y Vera C.U.155899
+% Javier Montiel González C.U.159216
+%--------------------------------------------------------------------------
+% Parámetros
+
+deltamin = 1.e-04;
+deltamax = 5; 
+delta= 1;
+eta = 0.25;        % Constate que determina si se acepta el paso
+maxiter = 100;     % Número máximo de iteraciones externas permitidas
+maxregion = 20;    % Es el numero máximo que permanece region de confianza 
+%en un solo punto
+tol = 1.e-06;      % tolerancia para la norma del gradiente.
+
+% Valores iniciales
+iter = 0;        % contador para las iteraciones externas
+jregion = 0;     % contador interno un punto xk
+iDelta = 0;      % contador interno para un valor delta
+
+g = gradiente(f,x0);
+ng = norm(g);
+B = hessian(f,x0);
+xk = x0;
+
+%Vectores auxiliares para guardar el resultado de cada iteración
+deltas=[];
+puntos=[];
+
+%Definimos los criterios de parada del método
+while(ng>tol && iter<maxiter && jregion<maxregion && iDelta<20)
+    %Almacenamos el valor de delta y xk en cada iteración
+    deltas=[deltas; delta];
+    puntos=[puntos; xk'];
+    %El paso que se obtiene por el método del doblez
+    pk = doblez(B, g, delta);
+    %Calculamos la recdución actual 
+    redact = feval(f,xk)-feval(f,xk+pk);
+    %Calculamos la reducción que se predice
+    redpre = -((1/2)*pk'*B*pk+g'*pk);
+    %Definimos el coeficiente de la reducción actual entre la reducción 
+    %que se predice
+    rho = redact/redpre;
+    
+    %Evaluamos los tres posibles casos del valor de rho
+    if rho >= (1 - eta)
+        %Se acepta el paso y puede aumentar el tamaño de delta
+        nuevoDelta=2*delta;
+        %Verificamos que delta no rebase deltamax
+        if(nuevoDelta<deltamax)
+            delta = nuevoDelta;
+            iDelta=0;
+        else
+        %En caso que rebase deltamax, el valor de delta no cambia
+            iDelta= iDelta+1;
+        end
+        xk = xk + pk;
+        jregion = 0;
+    elseif eta <= rho && rho < (1-eta)
+        %Se acepta el paso pero no cambia delta
+        xk = xk + pk;
+        jregion = 0;
+        iDelta=0;
+    else
+        %Se rechaza el paso y se puede reducir delta
+        nuevoDelta=(1/2)*delta;
+        if(nuevoDelta>deltamin)
+            delta = nuevoDelta;
+            iDelta=0;
+        else
+        %Se para el método porque ya no se puede mejorar 
+            iDelta= 20;
+        end
+        jregion = jregion + 1;
+    end
+    
+    %Calculamos los valores de la matriz hessiana y el vector gradiente en 
+    %el nuevo punto
+    B = hessian(f, xk);
+    g = gradiente(f, xk);
+    ng = norm(g);
+    iter = iter + 1;
+end
+
+xf = xk;
+end
+
